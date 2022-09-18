@@ -1,7 +1,8 @@
 function app(){
 
     let size = 3;
-
+    let name1 = 'Raven';
+    let name2 = 'Freya';
     const gameSize = (function(SIZE){
         const size = SIZE;
         const max = (size * size)-1;
@@ -11,17 +12,27 @@ function app(){
     })(size);
 
     const gameBoard = (function(size, max){
-        const initialState = [];
+        // let initialState = [];
         
-        for(i=0;i<=max;i++){
-            initialState.push(null);
+        // for(i=0;i<=max;i++){
+        //     initialState.push(null);
+        // }
+        // const state = [...initialState];
+
+        let state;
+
+        function resetState(){
+            state = [];
+            for(i=0;i<=max;i++){
+                state.push(null);
+            }
         }
-        const state = [...initialState];
+        resetState();
         function setCell(index, token){
             if(!state[index]){
                 state[index] = token;
                 return true;
-            }
+            } else
             return false;
         }
         function getCells(){
@@ -102,10 +113,14 @@ function app(){
             name,
             cells: [],
             getCells(){
-                return [...cells];
+                return [...this.cells];
             },
             setCell(valid, index){
-                if(valid){this.cells.push[index]}
+                if(valid){
+                    this.cells.push(index);
+                    return true;
+                }
+                return false;
             }
         }
     }
@@ -122,22 +137,17 @@ function app(){
         }
     })(gameSize.getSize(), gameSize.getMax());
 
+    // const gameState = (name1, name2, size)=>{
+    //     let player1 = 
+    // }
+
+    let player1 = createPlayer(name1);
+    let index = 4;
+    player1.setCell(gameBoard.setCell(index, player1.name), index);
+    console.log(player1.getCells())
     gameBoard.getCells();
-    let player1 = createPlayer('Jin');
-    gameBoard.setCell(3, player1.name);
-    gameBoard.getCells();
-    victory.getWinCondition();
-    console.log('tie? '+ gameBoard.checkForTie());
-    gameBoard.setCell(0, player1.name);
-    gameBoard.setCell(1, player1.name);
-    gameBoard.setCell(2, player1.name);
-    gameBoard.setCell(3, player1.name);
-    gameBoard.setCell(4, player1.name);
-    gameBoard.setCell(5, player1.name);
-    gameBoard.setCell(6, player1.name);
-    gameBoard.setCell(7, player1.name);
-    gameBoard.setCell(8, player1.name);
-    console.log('tie? '+ gameBoard.checkForTie());
+
+
     //end app()    
 }
 
