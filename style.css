@@ -22,7 +22,7 @@
     gap: var(--cell-gap);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    
     background: var(--board-bg);
 }
 

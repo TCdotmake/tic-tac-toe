@@ -1,6 +1,6 @@
 function app(){
 
-    let size = 3;
+    let size = 4;
 
     const gameSize = (function(SIZE){
         const size = SIZE;
@@ -13,7 +13,7 @@ function app(){
     const gameBoard = (function(size, max){
         const initialState = [];
         
-        for(i=0;i<max;i++){
+        for(i=0;i<=max;i++){
             initialState.push(null);
         }
         const state = [...initialState];
@@ -105,10 +105,23 @@ function app(){
         }
     }
 
+    const displayController = (function(size, max){
+        const gameBoard = document.getElementById('game-board');
+        gameBoard.style.gridTemplateColumns = `repeat(${size}, 1fr)`
+        for(let i=0; i <=max; i++){
+            let newCell = document.createElement('button');
+            newCell.classList.add('cell');
+            newCell.setAttribute('data-cell', i);
+            newCell.innerText = i;
+            gameBoard.insertAdjacentElement('beforeend', newCell);
+        }
+    })(gameSize.getSize(), gameSize.getMax());
+
     gameBoard.getCells();
     let player1 = createPlayer('Jin');
     gameBoard.setCell(3, player1.name);
     gameBoard.getCells();
+    victory.getWinCondition();
     //end app()    
 }
 
