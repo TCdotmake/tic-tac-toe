@@ -1,6 +1,6 @@
 function app(){
 
-    let size = 5;
+    let size = 3;
 
     const gameSize = (function(SIZE){
         const size = SIZE;
@@ -30,7 +30,8 @@ function app(){
         return {setCell,getCells}
     })(gameSize.getSize(), gameSize.getMax());
 
-    const gameMaster =(function(size, max){
+    const victory =(function(size, max){
+        
         const winCondition = [];
         
         //columns
@@ -54,10 +55,6 @@ function app(){
             }
             winCondition.push(row)
         }
-        function getWinCondition(){
-            console.log(winCondition);
-        }
-
         //diagonals
         let diag = [];
         let n = 1;
@@ -76,11 +73,31 @@ function app(){
         }
         winCondition.push(diag);
 
-        return {getWinCondition}
+        //public functions
+        function getWinCondition(){
+            console.log(winCondition);
+        }
+        
+        function checkForVictory(playerArr){
+            let victoryCells = [];
+            winCondition.forEach(winArr=>{
+                if(winArr.every(val=>playerArr.includes(val))){
+                    victoryCells = [...winArr];
+                }
+            })
+            return victoryCells;
+        }
+
+        return {getWinCondition, checkForVictory}
+
     })(gameSize.getSize(), gameSize.getMax());
-    gameMaster.getWinCondition();
+
+    victory.getWinCondition();
+    console.log(victory.checkForVictory([1,2,4,3,6,9])  );
     gameBoard.getCells();
-//end app()    
+
+
+    //end app()    
 }
 
 app();
