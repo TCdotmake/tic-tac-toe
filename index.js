@@ -1,39 +1,35 @@
 function app(){
 
-    let size = 3;
-    let name1 = 'Raven';
-    let name2 = 'Freya';
+    
 
     //composit methods for gameBoard
-    const gameBoardProto = ()=>{
-        function setCell(index, token){
+    const gameBoardProto = {
+        setCell: function(index, token){
             //if the cell is empty
             if(!this.state[index]){
                 this.state[index] = token;
                 return true;
             }
             else return false;
-        }
-        function getCells(){return this.state;}
-        function checkForTie(){
+        },
+        getCells: function(){return this.state;},
+        checkForTie: function(){
             if(this.state.includes(null)){return false}
             return true;
-        }
-        return {setCell,getCells, checkForTie}
+        },
     }
 
-    //top level method for setting game up
-    const setGameBoard = ()=>{
-        let state = [];
-        for(i=0;i<=this.max;i++){
-            state.push(null);
-        }
-        this.gameBoard.state = [...state];
-    }
-
-    //top level method for setting game up
-    const setWinCondition = ()=>{
-        let state = [];
+    const setupMethods = {
+        setGameBoard: function(){
+            let state = [];
+            for(i=0;i<=this.max;i++){
+                state.push(null);
+            }
+            console.log(this)
+            this.gameBoard.state = [...state];
+        },
+        setWinCondition: function(){
+            let state = [];
         //columns
         for(let i =0; i<this.size; i++){
             let n = i;
@@ -72,7 +68,26 @@ function app(){
         }
         state.push(diag);
         this.winCondition.state = [...state];
+        },
+        initBoardDisplay: function(){
+            const gameBoard = document.getElementById('game-board');
+        //clear board if not empty
+        while(gameBoard.firstChild){
+            gameBoard.removeChild(gameBoard.lastChild);
+        }
+        //set size of sides
+        gameBoard.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
+        //populate with cells
+        for(let i=0; i <=this.max; i++){
+            let newCell = document.createElement('button');
+            newCell.classList.add('cell');
+            newCell.setAttribute('data-cell', i);
+            newCell.innerText = i;
+            gameBoard.insertAdjacentElement('beforeend', newCell);
+        }
+        },
     }
+
 
     //top level method for gameflow
     function checkForVictory(playerArr){
@@ -86,11 +101,10 @@ function app(){
         return result;
     }
 
-    const winConditionProto = ()=>{
-        function getWinCondition(){
+    const winConditionProto ={
+        getWinCondition: function(){
             return [...this.state];
-        };
-        return {getWinCondition}
+        }
     }
 
     function createPlayer(name){
@@ -110,31 +124,31 @@ function app(){
         }
     }
 
-    const initBoardDisplay = ()=>{
-        const gameBoard = document.getElementById('game-board');
-        //clear board if not empty
-        while(gameBoard.firstChild){
-            gameBoard.removeChild(gameBoard.lastChild);
+
+    const ticTacToe = (function(name1, name2, size){
+        let max = (size * size)-1;
+        return{
+            player_1: createPlayer(name1),
+            player_2: createPlayer(name2),
+            size,
+            max,
+            turn: true,
+            gameBoard: {
+                state: [],
+                ...gameBoardProto
+            },
+            winCondition: {
+                state: [],
+                ...winConditionProto
+            },
+            ...setupMethods,
         }
-        //set size of sides
-        gameBoard.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
-        //populate with cells
-        for(let i=0; i <=this.max; i++){
-            let newCell = document.createElement('button');
-            newCell.classList.add('cell');
-            newCell.setAttribute('data-cell', i);
-            newCell.innerText = i;
-            gameBoard.insertAdjacentElement('beforeend', newCell);
-        }
-    }
+    })(name1='player1', name2='player2', size=3);
 
-
-
-    let player1 = createPlayer(name1);
-    let index = 4;
-    player1.setCell(gameBoard.setCell(index, player1.name), index);
-    console.log(player1.getCells())
-    gameBoard.getCells();
+    ticTacToe.setGameBoard();
+    ticTacToe.setWinCondition();
+    ticTacToe.initBoardDisplay();
+    console.log(ticTacToe.winCondition.getWinCondition())
 
 
     //end app()    
