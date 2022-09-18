@@ -1,6 +1,6 @@
 function app(){
 
-    let size = 4;
+    let size = 3;
 
     const gameSize = (function(SIZE){
         const size = SIZE;
@@ -27,7 +27,12 @@ function app(){
         function getCells(){
             console.log(state);
         }
-        return {setCell,getCells}
+        //tie is only meanful after checkForVictory, defined as no more possible moves on the board
+        function checkForTie(){
+            if(state.includes(null)){return false}
+            return true;
+        }
+        return {setCell,getCells, checkForTie}
     })(gameSize.getSize(), gameSize.getMax());
 
     const victory =(function(size, max){
@@ -122,6 +127,17 @@ function app(){
     gameBoard.setCell(3, player1.name);
     gameBoard.getCells();
     victory.getWinCondition();
+    console.log('tie? '+ gameBoard.checkForTie());
+    gameBoard.setCell(0, player1.name);
+    gameBoard.setCell(1, player1.name);
+    gameBoard.setCell(2, player1.name);
+    gameBoard.setCell(3, player1.name);
+    gameBoard.setCell(4, player1.name);
+    gameBoard.setCell(5, player1.name);
+    gameBoard.setCell(6, player1.name);
+    gameBoard.setCell(7, player1.name);
+    gameBoard.setCell(8, player1.name);
+    console.log('tie? '+ gameBoard.checkForTie());
     //end app()    
 }
 
