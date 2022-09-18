@@ -3,110 +3,95 @@ function app(){
     let size = 3;
     let name1 = 'Raven';
     let name2 = 'Freya';
-    const gameSize = (function(SIZE){
-        const size = SIZE;
-        const max = (size * size)-1;
-        function getSize(){return size;}
-        function getMax(){return max;}
-        return{getSize, getMax}
-    })(size);
 
-    const gameBoard = (function(size, max){
-        // let initialState = [];
-        
-        // for(i=0;i<=max;i++){
-        //     initialState.push(null);
-        // }
-        // const state = [...initialState];
-
-        let state;
-
-        function resetState(){
-            state = [];
-            for(i=0;i<=max;i++){
-                state.push(null);
-            }
-        }
-        resetState();
+    //composit methods for gameBoard
+    const gameBoardProto = ()=>{
         function setCell(index, token){
-            if(!state[index]){
-                state[index] = token;
+            //if the cell is empty
+            if(!this.state[index]){
+                this.state[index] = token;
                 return true;
-            } else
-            return false;
+            }
+            else return false;
         }
-        function getCells(){
-            console.log(state);
-        }
-        //tie is only meanful after checkForVictory, defined as no more possible moves on the board
+        function getCells(){return this.state;}
         function checkForTie(){
-            if(state.includes(null)){return false}
+            if(this.state.includes(null)){return false}
             return true;
         }
         return {setCell,getCells, checkForTie}
-    })(gameSize.getSize(), gameSize.getMax());
+    }
 
-    const victory =(function(size, max){
-        
-        const winCondition = [];
-        
+    //top level method for setting game up
+    const setGameBoard = ()=>{
+        let state = [];
+        for(i=0;i<=this.max;i++){
+            state.push(null);
+        }
+        this.gameBoard.state = [...state];
+    }
+
+    //top level method for setting game up
+    const setWinCondition = ()=>{
+        let state = [];
         //columns
-        for(let i =0; i<size; i++)
-        {
+        for(let i =0; i<this.size; i++){
             let n = i;
             let column = [];
-            while(n<=max){
+            while(n<=this.max){
                 column.push(n);
-                n+=size;
+                n+=this.size;
             }
-            winCondition.push(column);
+            state.push(column);
         }
         //rows
-        for(let i = 0; i<max; i+=size){
+        for(let i = 0; i<this.max; i+=this.size){
             let n = i;
-            const next = i + size;
+            const next = i + this.size;
             let row = [];
             while(n<next){
                 row.push(n++);
             }
-            winCondition.push(row)
+            state.push(row)
         }
         //diagonals
         let diag = [];
         let n = 0;
-        let step = size + 1;
-        while(n<=max){
+        let step = this.size + 1;
+        while(n<=this.max){
             diag.push(n);
             n+=step;
         }
-        winCondition.push(diag);
+        state.push(diag);
         diag = [];
-        n = size-1;
-        step = size -1;
-        while(n<max){
+        n = this.size-1;
+        step = this.size -1;
+        while(n<this.max){
             diag.push(n);
             n+=step;
         }
-        winCondition.push(diag);
+        state.push(diag);
+        this.winCondition.state = [...state];
+    }
 
-        //public functions
+    //top level method for gameflow
+    function checkForVictory(playerArr){
+        let victoryCells = [];
+        this.winCondition.state.forEach(winArr=>{
+            if(winArr.every(val=>playerArr.includes(val))){
+                victoryCells = [...winArr];
+            }
+        })
+        let result = victoryCells.length>0? {win: true, victoryCells} : {win: false};
+        return result;
+    }
+
+    const winConditionProto = ()=>{
         function getWinCondition(){
-            console.log(winCondition);
-        }
-        
-        function checkForVictory(playerArr){
-            let victoryCells = [];
-            winCondition.forEach(winArr=>{
-                if(winArr.every(val=>playerArr.includes(val))){
-                    victoryCells = [...winArr];
-                }
-            })
-            return victoryCells;
-        }
-
-        return {getWinCondition, checkForVictory}
-
-    })(gameSize.getSize(), gameSize.getMax());
+            return [...this.state];
+        };
+        return {getWinCondition}
+    }
 
     function createPlayer(name){
         return{
@@ -125,21 +110,25 @@ function app(){
         }
     }
 
-    const displayController = (function(size, max){
+    const initBoardDisplay = ()=>{
         const gameBoard = document.getElementById('game-board');
-        gameBoard.style.gridTemplateColumns = `repeat(${size}, 1fr)`
-        for(let i=0; i <=max; i++){
+        //clear board if not empty
+        while(gameBoard.firstChild){
+            gameBoard.removeChild(gameBoard.lastChild);
+        }
+        //set size of sides
+        gameBoard.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
+        //populate with cells
+        for(let i=0; i <=this.max; i++){
             let newCell = document.createElement('button');
             newCell.classList.add('cell');
             newCell.setAttribute('data-cell', i);
             newCell.innerText = i;
             gameBoard.insertAdjacentElement('beforeend', newCell);
         }
-    })(gameSize.getSize(), gameSize.getMax());
+    }
 
-    // const gameState = (name1, name2, size)=>{
-    //     let player1 = 
-    // }
+
 
     let player1 = createPlayer(name1);
     let index = 4;
