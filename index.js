@@ -25,7 +25,7 @@ function app(){
             for(i=0;i<=this.max;i++){
                 state.push(null);
             }
-            console.log(this)
+            
             this.gameBoard.state = [...state];
         },
         setWinCondition: function(){
@@ -83,9 +83,18 @@ function app(){
             newCell.classList.add('cell');
             newCell.setAttribute('data-cell', i);
             newCell.innerText = i;
+            newCell.addEventListener('click', e=>{handleClick(e)});
             gameBoard.insertAdjacentElement('beforeend', newCell);
         }
         },
+    }
+
+    function handleClick(e){
+        const index = e.target.dataset.cell;
+        let response = ticTacToe.validateMove(index);
+        if(response.result){
+            e.target.innerText = response.token;
+        }
     }
 
 
@@ -111,6 +120,7 @@ function app(){
         return{
             name,
             cells: [],
+            token: name,
             getCells(){
                 return [...this.cells];
             },
@@ -123,6 +133,7 @@ function app(){
             }
         }
     }
+
 
 
     const ticTacToe = (function(name1, name2, size){
@@ -142,13 +153,30 @@ function app(){
                 ...winConditionProto
             },
             ...setupMethods,
+            setupGame: function(){
+                this.setGameBoard();
+                this.setWinCondition();
+                this.initBoardDisplay();
+            },
+            validateMove: function(index){
+                let currentPlayer;
+                //determine whose turn it is
+                if(this.turn){
+                    currentPlayer = this.player_1;
+                }
+                else{currentPlayer = this.player_2;}
+                //try to place token on cell
+                let result = currentPlayer.setCell(this.gameBoard.setCell(index, currentPlayer.token), index);
+                //toggle player if successful 
+                if(result){this.turn = !this.turn;}
+                let token =currentPlayer.token;
+                return {result, token}
+            },
         }
     })(name1='player1', name2='player2', size=3);
 
-    ticTacToe.setGameBoard();
-    ticTacToe.setWinCondition();
-    ticTacToe.initBoardDisplay();
-    console.log(ticTacToe.winCondition.getWinCondition())
+    ticTacToe.setupGame();
+   
 
 
     //end app()    
