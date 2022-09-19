@@ -82,7 +82,7 @@ function app(){
             let newCell = document.createElement('button');
             newCell.classList.add('cell');
             newCell.setAttribute('data-cell', i);
-            newCell.innerText = i;
+            // newCell.innerText = i;
             newCell.addEventListener('click', e=>{handleClick(e)});
             gameBoard.insertAdjacentElement('beforeend', newCell);
         }
@@ -93,7 +93,7 @@ function app(){
         const index = e.target.dataset.cell;
         let response = ticTacToe.validateMove(index);
         if(response.result){
-            e.target.innerText = response.token;
+            e.target.insertAdjacentElement('beforeend', response.token);
         }
     }
 
@@ -116,11 +116,12 @@ function app(){
         }
     }
 
-    function createPlayer(name){
+    function createPlayer(player){
+        const {name, token} = player;
         return{
             name,
             cells: [],
-            token: name,
+            token,
             getCells(){
                 return [...this.cells];
             },
@@ -130,17 +131,25 @@ function app(){
                     return true;
                 }
                 return false;
+            },
+            createToken(){
+                let newToken = document.createElement('i');
+                newToken.classList.add('bi');
+                newToken.classList.add(this.token);
+                return newToken;
             }
+            
         }
     }
 
+    const defaultP1 = {name: 'player1', token: 'bi-brightness-high-fill'};
+    const defaultP2 = {name: 'player2', token: 'bi-moon-stars-fill'};
 
-
-    const ticTacToe = (function(name1, name2, size){
+    const ticTacToe = (function(player1, player2, size){
         let max = (size * size)-1;
         return{
-            player_1: createPlayer(name1),
-            player_2: createPlayer(name2),
+            player_1: createPlayer(player1),
+            player_2: createPlayer(player2),
             size,
             max,
             turn: true,
@@ -169,11 +178,11 @@ function app(){
                 let result = currentPlayer.setCell(this.gameBoard.setCell(index, currentPlayer.token), index);
                 //toggle player if successful 
                 if(result){this.turn = !this.turn;}
-                let token =currentPlayer.token;
+                let token =currentPlayer.createToken();
                 return {result, token}
             },
         }
-    })(name1='player1', name2='player2', size=3);
+    })(player1=defaultP1, player2=defaultP2, size=3);
 
     ticTacToe.setupGame();
    
