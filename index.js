@@ -94,27 +94,18 @@ function app() {
   function handleClick(e) {
     const index = e.target.dataset.cell;
     let response = ticTacToe.validateMove(index);
-    console.log(response);
+   
     if (response.result) {
       e.target.insertAdjacentElement("beforeend", response.token);
     }
     if(response.win){
-        console.log(response.victoryCells);
+        const cells = document.querySelectorAll('.cell');
+        response.victoryCells.forEach(index=>{
+            cells[index].classList.add('victory')
+        })
     }
   }
 
-  //top level method for gameflow
-//   function checkForVictory(playerArr) {
-//     let victoryCells = [];
-//     this.winCondition.state.forEach((winArr) => {
-//       if (winArr.every((val) => playerArr.includes(val))) {
-//         victoryCells = [...winArr];
-//       }
-//     });
-//     let result =
-//       victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
-//     return result;
-//   }
 
   const winConditionProto = {
     getWinCondition: function () {
@@ -173,7 +164,7 @@ function app() {
         this.initBoardDisplay();
       },
       checkForVictory: function (playerArr) {
-        console.log(playerArr)
+        
         let victoryCells = [];
         this.winCondition.state.forEach((winArr) => {
           if (winArr.every((val) => playerArr.includes(val))) {
