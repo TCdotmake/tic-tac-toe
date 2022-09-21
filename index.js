@@ -92,11 +92,15 @@ function app() {
   };
 
   function handleClick(e) {
+    console.log(e.target)
     const index = e.target.dataset.cell;
-    let response = ticTacToe.validateMove(index);
-   
-    if (response.result) {
+    let response = ticTacToe.validatePlayerMove(index);
+    //if move is valid
+    if (response.valid) {
       e.target.insertAdjacentElement("beforeend", response.token);
+      e.target.setAttribute('disabled', true);
+      e.target.classList.add(response.playerClass);
+      
     }
     if(response.win){
         const cells = document.querySelectorAll('.cell');
@@ -132,14 +136,15 @@ function app() {
       createToken() {
         let newToken = document.createElement("i");
         newToken.classList.add("bi");
+        newToken.classList.add("token");
         newToken.classList.add(this.token);
         return newToken;
       },
     };
   }
 
-  const defaultP1 = { name: "player1", token: "bi-brightness-high-fill" };
-  const defaultP2 = { name: "player2", token: "bi-moon-stars-fill" };
+  const defaultP1 = { name: "player1", token: "bi-circle-fill" };
+  const defaultP2 = { name: "player2", token: "bi-triangle-fill" };
 
   const ticTacToe = (function (player1, player2, size) {
     let max = size * size - 1;
@@ -177,25 +182,28 @@ function app() {
             : { win: false };
         return result;
       },
-      validateMove: function (index) {
+      validatePlayerMove: function (index) {
         let currentPlayer;
+        let playerClass = '';
         //determine whose turn it is
         if (this.turn) {
           currentPlayer = this.player_1;
+          playerClass = 'player-one';
         } else {
           currentPlayer = this.player_2;
+          playerClass = 'player-two';
         }
         //try to place token on cell
-        let result = currentPlayer.setCell(
+        let valid = currentPlayer.setCell(
           this.gameBoard.setCell(index, currentPlayer.token),
           index
         );
         //toggle player if successful
-        if (result) {
+        if (valid) {
           this.turn = !this.turn;
         }
         let token = currentPlayer.createToken();
-        return { result, token, ...this.checkForVictory(currentPlayer.getCells()) };
+        return { valid, token, playerClass, ...this.checkForVictory(currentPlayer.getCells()) };
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));

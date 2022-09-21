@@ -8,13 +8,33 @@
     --cell-width: 80px;
     --cell-gap: 10px;
     --board-bg: #333;
+    --tomato-red: #D7402B;
+    --napa-vineyards: #83AC58;
+    --paper-white: #E0E2DC;
+    --player-one-color: var(--tomato-red);
+    --player-two-color: var(--napa-vineyards);
+    --cell-bg: var(--paper-white);
 }
 
 .cell{
     width: var(--cell-width);
     aspect-ratio: 1/1;
     border: none;
-    
+    background: var(--cell-bg);
+    font-size: 3rem;
+}
+
+.cell i{
+    width: 1em;
+    height: 1em;
+}
+
+.player-one{
+    color: var(--player-one-color);
+}
+
+.player-two{
+    color:var(--player-two-color);
 }
 
 #game-board{
@@ -33,6 +53,21 @@ body{
     background: #555;
 }
 
-.victory{
-    background: red;
+@keyframes pulse {
+    0%{
+        
+        font-size: 2rem;
+    }
+    50%{
+        font-size: 3rem;
+    }
+    100%{
+        
+        font-size: 2rem;
+    }
 }
+
+.victory{
+    animation: 1s infinite pulse;
+}
+
