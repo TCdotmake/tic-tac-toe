@@ -11,24 +11,78 @@ function app() {
     getCells: function () {
       return this.state;
     },
+  };
+
+  const gameFlowMethods = {
+    checkForVictory: function (playerArr) {
+      let victoryCells = [];
+      this.winCondition.state.forEach((winArr) => {
+        if (winArr.every((val) => playerArr.includes(val))) {
+          victoryCells = [...winArr];
+        }
+      });
+      let result =
+        victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
+      if (result.win) {
+        this.active = false;
+      }
+      return result;
+    },
     checkForTie: function () {
-      if (this.state.includes(null)) {
+      if (this.winCondition.state.includes(null)) {
         return false;
       }
       return true;
     },
+    validatePlayerMove: function (index) {
+      if (this.active) {
+        let currentPlayer;
+        let playerClass = "";
+        //determine whose turn it is
+        if (this.turn) {
+          currentPlayer = this.player_1;
+          playerClass = "player-one";
+        } else {
+          currentPlayer = this.player_2;
+          playerClass = "player-two";
+        }
+        //try to place token on cell
+        let valid = currentPlayer.setCell(
+          this.gameBoard.setCell(index, currentPlayer.token),
+          index
+        );
+
+        let token = currentPlayer.createToken();
+        const victoryObj = this.checkForVictory(currentPlayer.getCells());
+        if (this.active) {
+          this.toggleActivePlayer();
+        }
+        return {
+          valid,
+          token,
+          playerClass,
+          ...victoryObj,
+        };
+      }
+    },
+    toggleActivePlayer: function () {
+      this.turn = !this.turn;
+      const p1 = document.getElementById("p1");
+      const p2 = document.getElementById("p2");
+      p1.classList.toggle("active");
+      p2.classList.toggle("active");
+    },
   };
 
   const setupMethods = {
-    setGameBoard: function () {
+    setupGameBoard: function () {
       let state = [];
       for (i = 0; i <= this.max; i++) {
         state.push(null);
       }
-
       this.gameBoard.state = [...state];
     },
-    setWinCondition: function () {
+    setupWinCondition: function () {
       let state = [];
       //columns
       for (let i = 0; i < this.size; i++) {
@@ -69,7 +123,7 @@ function app() {
       state.push(diag);
       this.winCondition.state = [...state];
     },
-    initBoardDisplay: function () {
+    setupBoardDisplay: function () {
       const gameBoard = document.getElementById("game-board");
       //clear board if not empty
       while (gameBoard.firstChild) {
@@ -89,7 +143,12 @@ function app() {
         gameBoard.insertAdjacentElement("beforeend", newCell);
       }
     },
-
+    coinFlip: () => {
+      return Math.random() > 0.49 ? true : false;
+    },
+    setupFirstTurn: function () {
+      this.turn = this.coinFlip();
+    },
     setupPlayerNames: function () {
       const p1 = document.getElementById("p1");
       p1.innerText = this.player_1.name;
@@ -121,14 +180,7 @@ function app() {
     }
   }
 
-  const displayMethods = {
-    toggleActivePlayer: function () {
-      const p1 = document.getElementById("p1");
-      const p2 = document.getElementById("p2");
-      p1.classList.toggle("active");
-      p2.classList.toggle("active");
-    },
-  };
+  const displayMethods = {};
 
   const winConditionProto = {
     getWinCondition: function () {
@@ -182,77 +234,19 @@ function app() {
         ...winConditionProto,
       },
       ...setupMethods,
-      ...displayMethods,
+      ...gameFlowMethods,
       setupGame: function () {
-        this.setGameBoard();
-        this.setWinCondition();
-        this.initBoardDisplay();
-        this.turn = this.coinFlip();
+        this.setupGameBoard();
+        this.setupWinCondition();
+        this.setupBoardDisplay();
+        this.setupFirstTurn();
         this.setupPlayerNames();
         this.active = true;
-      },
-      checkForVictory: function (playerArr) {
-        let victoryCells = [];
-        this.winCondition.state.forEach((winArr) => {
-          if (winArr.every((val) => playerArr.includes(val))) {
-            victoryCells = [...winArr];
-          }
-        });
-        let result =
-          victoryCells.length > 0
-            ? { win: true, victoryCells }
-            : { win: false };
-        if (result.win) {
-          this.active = false;
-        }
-        return result;
-      },
-      coinFlip: () => {
-        return Math.random() > 0.49 ? true : false;
-      },
-      validatePlayerMove: function (index) {
-        if (this.active) {
-          let currentPlayer;
-          let playerClass = "";
-          //determine whose turn it is
-          if (this.turn) {
-            currentPlayer = this.player_1;
-            playerClass = "player-one";
-          } else {
-            currentPlayer = this.player_2;
-            playerClass = "player-two";
-          }
-          //try to place token on cell
-          let valid = currentPlayer.setCell(
-            this.gameBoard.setCell(index, currentPlayer.token),
-            index
-          );
-          //toggle player if successful
-          if (valid) {
-            this.turn = !this.turn;
-            this.toggleActivePlayer();
-          }
-          let token = currentPlayer.createToken();
-          return {
-            valid,
-            token,
-            playerClass,
-            ...this.checkForVictory(currentPlayer.getCells()),
-          };
-        }
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
 
   ticTacToe.setupGame();
-  console.log(ticTacToe.winCondition.getWinCondition());
-  //end app()
-  console.log(ticTacToe.coinFlip());
-  console.log(ticTacToe.coinFlip());
-  console.log(ticTacToe.coinFlip());
-  console.log(ticTacToe.coinFlip());
-  console.log(ticTacToe.coinFlip());
-  console.log(ticTacToe.coinFlip());
 }
 
 app();
