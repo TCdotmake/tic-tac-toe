@@ -92,24 +92,22 @@ function app() {
   };
 
   function handleClick(e) {
-    console.log(e.target)
+    console.log(e.target);
     const index = e.target.dataset.cell;
     let response = ticTacToe.validatePlayerMove(index);
     //if move is valid
     if (response.valid) {
       e.target.insertAdjacentElement("beforeend", response.token);
-      e.target.setAttribute('disabled', true);
+      e.target.setAttribute("disabled", true);
       e.target.classList.add(response.playerClass);
-      
     }
-    if(response.win){
-        const cells = document.querySelectorAll('.cell');
-        response.victoryCells.forEach(index=>{
-            cells[index].classList.add('victory')
-        })
+    if (response.win) {
+      const cells = document.querySelectorAll(".cell");
+      response.victoryCells.forEach((index) => {
+        cells[index].classList.add("victory");
+      });
     }
   }
-
 
   const winConditionProto = {
     getWinCondition: function () {
@@ -167,9 +165,9 @@ function app() {
         this.setGameBoard();
         this.setWinCondition();
         this.initBoardDisplay();
+        this.turn = this.coinFlip();
       },
       checkForVictory: function (playerArr) {
-        
         let victoryCells = [];
         this.winCondition.state.forEach((winArr) => {
           if (winArr.every((val) => playerArr.includes(val))) {
@@ -182,16 +180,19 @@ function app() {
             : { win: false };
         return result;
       },
+      coinFlip: () => {
+        return Math.random() > 0.49 ? true : false;
+      },
       validatePlayerMove: function (index) {
         let currentPlayer;
-        let playerClass = '';
+        let playerClass = "";
         //determine whose turn it is
         if (this.turn) {
           currentPlayer = this.player_1;
-          playerClass = 'player-one';
+          playerClass = "player-one";
         } else {
           currentPlayer = this.player_2;
-          playerClass = 'player-two';
+          playerClass = "player-two";
         }
         //try to place token on cell
         let valid = currentPlayer.setCell(
@@ -203,7 +204,12 @@ function app() {
           this.turn = !this.turn;
         }
         let token = currentPlayer.createToken();
-        return { valid, token, playerClass, ...this.checkForVictory(currentPlayer.getCells()) };
+        return {
+          valid,
+          token,
+          playerClass,
+          ...this.checkForVictory(currentPlayer.getCells()),
+        };
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
@@ -211,6 +217,12 @@ function app() {
   ticTacToe.setupGame();
   console.log(ticTacToe.winCondition.getWinCondition());
   //end app()
+  console.log(ticTacToe.coinFlip());
+  console.log(ticTacToe.coinFlip());
+  console.log(ticTacToe.coinFlip());
+  console.log(ticTacToe.coinFlip());
+  console.log(ticTacToe.coinFlip());
+  console.log(ticTacToe.coinFlip());
 }
 
 app();

@@ -1,73 +1,98 @@
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
-:root{
-    font-size: 16px;
-    --cell-width: 80px;
-    --cell-gap: 10px;
-    --board-bg: #333;
-    --tomato-red: #D7402B;
-    --napa-vineyards: #83AC58;
-    --paper-white: #E0E2DC;
-    --player-one-color: var(--tomato-red);
-    --player-two-color: var(--napa-vineyards);
-    --cell-bg: var(--paper-white);
-}
-
-.cell{
-    width: var(--cell-width);
-    aspect-ratio: 1/1;
-    border: none;
-    background: var(--cell-bg);
-    font-size: 3rem;
+:root {
+  font-size: 16px;
+  --cell-width: 80px;
+  --cell-gap: 10px;
+  --board-bg: #333;
+  --tomato-red: #d7402b;
+  --napa-vineyards: #83ac58;
+  --paper-white: #e0e2dc;
+  --player-one-color: var(--tomato-red);
+  --player-two-color: var(--napa-vineyards);
+  --cell-bg: var(--paper-white);
+  --playerName-font-size: 1.5rem;
 }
 
-.cell i{
-    width: 1em;
-    height: 1em;
+.cell {
+  width: var(--cell-width);
+  aspect-ratio: 1/1;
+  border: none;
+  background: var(--cell-bg);
+  font-size: 3rem;
 }
 
-.player-one{
-    color: var(--player-one-color);
+.cell i {
+  width: 1em;
+  height: 1em;
 }
 
-.player-two{
-    color:var(--player-two-color);
+.player-one {
+  color: var(--player-one-color);
 }
 
-#game-board{
-    width: fit-content;
-    gap: var(--cell-gap);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    
-    background: var(--board-bg);
+.player-two {
+  color: var(--player-two-color);
 }
 
-body{
-    min-height: 100vh;
-    display: grid;
-    place-content: center;
-    background: #555;
+#game-board {
+  width: fit-content;
+  gap: var(--cell-gap);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  background: var(--board-bg);
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  background: #555;
 }
 
 @keyframes pulse {
-    0%{
-        
-        font-size: 2rem;
-    }
-    50%{
-        font-size: 3rem;
-    }
-    100%{
-        
-        font-size: 2rem;
-    }
+  0% {
+    font-size: 2rem;
+  }
+  50% {
+    font-size: 3rem;
+  }
+  100% {
+    font-size: 2rem;
+  }
 }
 
-.victory{
-    animation: 1s infinite pulse;
+.victory {
+  animation: 1s infinite pulse;
 }
 
+.playerNameDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.playerName {
+  color: white;
+  background: var(--paper-white);
+  text-transform: uppercase;
+  font-size: var(--playerName-font-size);
+  width: 100%;
+  height: calc(var(--playerName-font-size) * 1.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#p1.active {
+  background: var(--player-one-color);
+}
+
+#p2.active {
+  background: var(--player-two-color);
+}
