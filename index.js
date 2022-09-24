@@ -81,6 +81,7 @@ function app() {
         state.push(null);
       }
       this.gameBoard.state = [...state];
+      this.setupBoardDisplay();
     },
     setupWinCondition: function () {
       let state = [];
@@ -238,7 +239,6 @@ function app() {
       setupGame: function () {
         this.setupGameBoard();
         this.setupWinCondition();
-        this.setupBoardDisplay();
         this.setupFirstTurn();
         this.setupPlayerNames();
         this.active = true;
