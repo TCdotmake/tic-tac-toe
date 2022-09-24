@@ -183,7 +183,17 @@ function app() {
     }
   }
 
-  const displayMethods = {};
+  const aiMethods = {
+    toggleAI: function(){
+      this.useAI = !this.useAI;
+      console.log('useAI: '+this.useAI);
+      const toggleBtn = document.getElementById('toggleAI');
+      if(this.useAI){toggleBtn.innerText = 'VS PLAYER';}
+      else{toggleBtn.innerText = 'VS A.I.';}
+      this.setupGame();
+    }
+    
+  }
 
   const winConditionProto = {
     getWinCondition: function () {
@@ -228,6 +238,7 @@ function app() {
       size,
       max,
       turn: true,
+      useAI: false,
       gameBoard: {
         state: [],
         ...gameBoardProto,
@@ -238,6 +249,7 @@ function app() {
       },
       ...setupMethods,
       ...gameFlowMethods,
+      ...aiMethods,
       setupGame: function () {
         this.setupGameBoard();
         this.setupWinCondition();
@@ -251,6 +263,8 @@ function app() {
   ticTacToe.setupGame();
   const newGame = document.getElementById('newGame');
   newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
+  const toggleAI = document.getElementById('toggleAI');
+  toggleAI.addEventListener('click', ()=>{ticTacToe.toggleAI()})
 }
 
 app();
