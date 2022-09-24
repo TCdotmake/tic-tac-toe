@@ -156,9 +156,11 @@ function app() {
       const p2 = document.getElementById("p2");
       p2.innerText = this.player_2.name;
       if (this.turn) {
-        p1.classList.toggle("active");
+        p1.classList.add("active");
+        p2.classList.remove('active');
       } else {
-        p2.classList.toggle("active");
+        p2.classList.add("active");
+        p1.classList.remove('active');
       }
     },
   };
@@ -247,6 +249,8 @@ function app() {
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
 
   ticTacToe.setupGame();
+  const newGame = document.getElementById('newGame');
+  newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
 }
 
 app();
