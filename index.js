@@ -18,6 +18,15 @@ function app() {
   };
 
   const gameFlowMethods = {
+    playerTurn: function(index){
+      this.setCells(index);
+      this.insertToken(index);
+      if(this.checkForwin()){
+        this.displayWinToken();
+        this.gameEnd();
+      }
+      if(this.active){this.toggleActivePlayer();}
+    },
     checkForVictory: function (playerArr) {
       let victoryCells = [];
       this.winCondition.state.forEach((winArr) => {
@@ -136,6 +145,11 @@ function app() {
       const p2 = document.getElementById("p2");
       p1.classList.toggle("active");
       p2.classList.toggle("active");
+      let currentPlayer = this.getCurrentPlayer();
+
+      if(currentPlayer.ai){
+        this.aiTurn();
+      }
     },
   };
 
@@ -239,14 +253,7 @@ function app() {
     const index = e.target.dataset.cell;
     //if game is active and move is valid
     if(ticTacToe.checkActive() && ticTacToe.validMove(index)){
-      //update data
-      ticTacToe.setCells(index);
-      ticTacToe.insertToken(index);
-      if(ticTacToe.checkForwin()){
-        ticTacToe.displayWinToken();
-        ticTacToe.gameEnd();
-      }
-      if(ticTacToe.active){ticTacToe.toggleActivePlayer();}
+      ticTacToe.playerTurn(index);
     }
   }
 
@@ -271,6 +278,13 @@ function app() {
 
 
   const aiMethods = {
+    //if AI is first, alway randomly put down a token for first move
+    firstTurn: function(){
+      let currentPlayer = this.getCurrentPlayer();
+      if(currentPlayer.ai){
+        this.playerTurn(this.randomIndexAI());
+      }
+    },
     toggleAI: function(){
       this.useAI = !this.useAI;
       console.log('useAI: '+this.useAI);
@@ -280,10 +294,46 @@ function app() {
       this.setupGame();
     },
 
-    randomMoveAI: function(){
-      
-      let index = Math.floor(Math.random()* this.gameBoard.validMoves.length);
-      return this.gameBoard.validMoves[index];
+    immediateActionAI: function(){
+      let currentPlayer = this.getCurrentPlayer();
+      if(currentPlayer.ai){
+        this.aiTurn();
+      }
+    },
+
+    toggleP1AI: function(){
+      this.player_1.ai = !this.player_1.ai;
+      if(this.player_1.ai){
+        this.player_1.name = 'A.I.';
+      }
+      else{
+        this.player_1.name = 'Player1';
+      }
+      this.setupPlayerNames();
+      //take immediate action if swapping from player to AI
+      this.immediateActionAI();
+    },
+
+    toggleP2AI: function(){
+      this.player_2.ai = !this.player_2.ai;
+      if(this.player_2.ai){
+        this.player_2.name = 'A.I.';
+      }
+      else{
+        this.player_2.name = 'Player2';
+      }
+      this.setupPlayerNames();
+      //take immediate action if swapping from player to AI
+      this.immediateActionAI();
+    },
+
+    randomIndexAI: function(){
+      let selection = Math.floor(Math.random()* this.gameBoard.validMoves.length);
+      return this.gameBoard.validMoves[selection].index;
+    },
+
+    aiTurn: function(){
+      this.playerTurn(this.getIndexAI());
     },
 
     getIndexAI: function(){
@@ -427,6 +477,7 @@ function app() {
       name,
       cells: [],
       token,
+      ai: false,
       getCells() {
         return [...this.cells];
       },
@@ -443,8 +494,8 @@ function app() {
     };
   }
 
-  const defaultP1 = { name: "Raven", token: "bi-circle-fill" };
-  const defaultP2 = { name: "Freya", token: "bi-triangle-fill" };
+  const defaultP1 = { name: "Player1", token: "bi-circle-fill" };
+  const defaultP2 = { name: "Player2", token: "bi-triangle-fill" };
 
   const ticTacToe = (function (player1, player2, size) {
     let max = size * size - 1;
@@ -474,6 +525,7 @@ function app() {
         this.setupPlayerNames();
         this.setupPlayerCells();
         this.active = true;
+        this.firstTurn();
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
@@ -482,12 +534,10 @@ function app() {
 
   const newGame = document.getElementById('newGame');
   newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
-  const toggleAI = document.getElementById('toggleAI');
-  toggleAI.addEventListener('click', ()=>{ticTacToe.toggleAI()})
-  const validMoves = document.getElementById('validMoves');
-  validMoves.addEventListener('click', ()=>{console.log(ticTacToe.gameBoard.validMoves)});
-  const randomMoves = document.getElementById('randomMoves');
-  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.getIndexAI())})
+  const toggleP1AI = document.getElementById('toggleP1AI');
+  const togglePA2I = document.getElementById('toggleP2AI');
+  toggleP1AI.addEventListener('click', ()=>{ticTacToe.toggleP1AI()});
+  toggleP2AI.addEventListener('click', ()=>{ticTacToe.toggleP2AI()});
 }
 
 app();
