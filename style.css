@@ -73,6 +73,19 @@ body {
   animation: 1s infinite pulse;
 }
 
+.token{
+  animation: .5s appear;
+}
+
+@keyframes appear {
+  0%{
+    font-size: .2em;
+  }
+  100%{
+    font-size: 1em;
+  }
+}
+
 .playerNameDiv {
   display: flex;
   justify-content: center;
@@ -123,7 +136,7 @@ button:hover{
 button:disabled:hover{
   cursor:default;
 }
-#newGame, #toggleAI{
+#newGame, #toggleAI, .big-btn{
   border: 1px solid black;
   border-radius: 10px;
   font-size: 2rem;

@@ -191,8 +191,14 @@ function app() {
       if(this.useAI){toggleBtn.innerText = 'VS PLAYER';}
       else{toggleBtn.innerText = 'VS A.I.';}
       this.setupGame();
+    },
+    validMoveAI: function(){
+      let result = [];
+      for(let i=0; i<this.gameBoard.state.length; i++){
+        if(this.gameBoard.state[i]===null){result.push(i);}
+      }
+      return result;
     }
-    
   }
 
   const winConditionProto = {
@@ -261,10 +267,13 @@ function app() {
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
 
   ticTacToe.setupGame();
+  console.log(ticTacToe.gameBoard.state);
   const newGame = document.getElementById('newGame');
   newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
   const toggleAI = document.getElementById('toggleAI');
   toggleAI.addEventListener('click', ()=>{ticTacToe.toggleAI()})
+  const validMoves = document.getElementById('validMoves');
+  validMoves.addEventListener('click', ()=>{console.log(ticTacToe.validMoveAI())})
 }
 
 app();
