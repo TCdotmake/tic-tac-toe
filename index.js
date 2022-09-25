@@ -29,7 +29,8 @@ function app() {
         victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
       return result;
     },
-    checkForwin: function(playerArr){
+    checkForwin: function(){
+      let playerArr = this.getCurrentPlayer().cells;
       let result = false;
       this.winCondition.state.forEach((winArr) => {
         if (winArr.every((val) => playerArr.includes(val))) {
@@ -39,6 +40,7 @@ function app() {
       return result;
     },
     getWinArr: function(){
+      let playerArr = this.getCurrentPlayer().cells;
       let result = [];
       this.winCondition.state.forEach((winArr) => {
         if (winArr.every((val) => playerArr.includes(val))) {
@@ -73,7 +75,7 @@ function app() {
           currentPlayer = this.player_2;
           playerClass = "player-two";
       }
-      currentPlayer.setCells(index);
+      currentPlayer.setCell(index);
       this.gameBoard.setCell(index, currentPlayer.token)
     },
     getCurrentPlayer: function(){
@@ -202,9 +204,7 @@ function app() {
         newCell.classList.add("cell");
         newCell.setAttribute("data-cell", i);
         // newCell.innerText = i;
-        newCell.addEventListener("click", (e) => {
-          
-          handleClickAlt(e);
+        newCell.addEventListener("click", (e) => { 
           handleClick(e);
         });
         gameBoard.insertAdjacentElement("beforeend", newCell);
@@ -235,33 +235,40 @@ function app() {
     }
   };
 
-  function handleClick(e) {
-    
-    const index = e.target.dataset.cell;
-    let response = ticTacToe.validatePlayerMove(index);
-    //if move is valid
-    if (response.valid) {
-      e.target.insertAdjacentElement("beforeend", response.token);
-      e.target.setAttribute("disabled", true);
-      e.target.classList.add(response.playerClass);
-    }
-    //if move lead to win
-    if (response.win) {
-      const cells = document.querySelectorAll(".cell");
-      response.victoryCells.forEach((index) => {
-        cells[index].classList.add("victory");
-      });
-    }
-  }
-
-  function handleClickAlt(e){
+  function handleClick(e){
     const index = e.target.dataset.cell;
     //if game is active and move is valid
     if(ticTacToe.checkActive() && ticTacToe.validMove(index)){
       //update data
       ticTacToe.setCells(index);
+      ticTacToe.insertToken(index);
+      if(ticTacToe.checkForwin()){
+        ticTacToe.displayWinToken();
+        ticTacToe.gameEnd();
+      }
+      if(ticTacToe.active){ticTacToe.toggleActivePlayer();}
     }
   }
+
+  const displayMethods = {
+    insertToken: function(index){
+      const cells = document.getElementsByClassName('cell');
+      let targetCell = cells[index];
+      let token = this.getCurrentToken();
+      let playerClass = this.getCurrentPlayerClass();
+      targetCell.insertAdjacentElement("beforeend", token);
+      targetCell.setAttribute("disabled", true);
+      targetCell.classList.add(playerClass);
+    },
+    displayWinToken: function(){
+      const cells = document.querySelectorAll(".cell");
+      const victoryCells = this.getWinArr();
+      victoryCells.forEach(index=>{
+        cells[index].classList.add('victory');
+      })
+    }
+  }
+
 
   const aiMethods = {
     toggleAI: function(){
@@ -459,6 +466,7 @@ function app() {
       ...setupMethods,
       ...gameFlowMethods,
       ...aiMethods,
+      ...displayMethods,
       setupGame: function () {
         this.setupGameBoard();
         this.setupWinCondition();
