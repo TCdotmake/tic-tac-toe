@@ -2,12 +2,8 @@ function app() {
   //composit methods for gameBoard
   const gameBoardProto = {
     setCell: function (index, token) {
-      //if the cell is empty
-      if (!this.state[index]) {
-        this.state[index] = token;
+      this.state[index] = token;
         this.updateValidMoves();
-        return true;
-      } else return false;
     },
     getCells: function () {
       return this.state;
@@ -33,6 +29,24 @@ function app() {
         victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
       return result;
     },
+    checkForwin: function(playerArr){
+      let result = false;
+      this.winCondition.state.forEach((winArr) => {
+        if (winArr.every((val) => playerArr.includes(val))) {
+          result = true;
+        }
+      });
+      return result;
+    },
+    getWinArr: function(){
+      let result = [];
+      this.winCondition.state.forEach((winArr) => {
+        if (winArr.every((val) => playerArr.includes(val))) {
+          result = [...winArr];
+        }
+      });
+      return result;
+    },
     gameEnd: function (){this.active = false;},
     checkForTie: function () {
       if (this.winCondition.state.includes(null)) {
@@ -47,6 +61,39 @@ function app() {
         if(move.index == index){valid=true;}
       }
       return valid;
+    },
+    setCells: function(index){
+      let currentPlayer;
+      let playerClass = "";
+      //determine whose turn it is
+      if (this.turn) {
+          currentPlayer = this.player_1;
+          playerClass = "player-one";
+      } else {
+          currentPlayer = this.player_2;
+          playerClass = "player-two";
+      }
+      currentPlayer.setCells(index);
+      this.gameBoard.setCell(index, currentPlayer.token)
+    },
+    getCurrentPlayer: function(){
+      let currentPlayer;
+      if (this.turn) {
+        currentPlayer = this.player_1;
+      } else {
+        currentPlayer = this.player_2;
+      }
+      return currentPlayer;
+    },
+    getCurrentPlayerClass: function(){
+      let playerClass = "player-two";
+      if (this.turn) {
+        playerClass = "player-one";
+      } 
+      return playerClass;
+    },
+    getCurrentToken: function(){
+      return this.getCurrentPlayer().createToken();
     },
     validatePlayerMove: function (index) {
       if (this.active) {
@@ -209,8 +256,11 @@ function app() {
 
   function handleClickAlt(e){
     const index = e.target.dataset.cell;
-    console.log('active? ', ticTacToe.checkActive())
-    console.log(ticTacToe.validMove(index));
+    //if game is active and move is valid
+    if(ticTacToe.checkActive() && ticTacToe.validMove(index)){
+      //update data
+      ticTacToe.setCells(index);
+    }
   }
 
   const aiMethods = {
@@ -373,12 +423,8 @@ function app() {
       getCells() {
         return [...this.cells];
       },
-      setCell(valid, index) {
-        if (valid) {
-          this.cells.push(parseInt(index));
-          return true;
-        }
-        return false;
+      setCell(index) {
+        this.cells.push(parseInt(index));
       },
       createToken() {
         let newToken = document.createElement("i");
