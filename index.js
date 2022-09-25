@@ -216,20 +216,33 @@ function app() {
         validMoves.push({...ele});
       }
       validMoves = this.guardAI(validMoves);
+      validMoves = this.offensiveAI(validMoves);
       return validMoves;
     },
     guardAI: function(moves){
       //determine who AI is playing against
-      let opponent = this.player_1;
-      if(this.turn){opponent = this.player_2;}
+      let player = this.player_1;
+      if(this.turn){player = this.player_2;}
+      let self = false;
+      return this.parseWinAI(player, moves, self);
+    },
+    parseWinAI: function(player, moves, self){   
       for(n of moves){
-        let enemyCells = [...opponent.cells];
-        enemyCells.push(n.index);
-        if(this.checkForVictory(enemyCells).win){
+        let playerCells = [...player.cells];
+        playerCells.push(n.index);
+        if(this.checkForVictory(playerCells).win){
+          if(self){n.value = Infinity}
           n.value++;
         }
       }
       return moves;
+    },
+    offensiveAI: function(moves){
+      //determine self
+      let player = this.player_1;
+      if(!this.turn){player = this.player_2;}
+      let self = true;
+      return this.parseWinAI(player, moves, self);
     }
   }
 
