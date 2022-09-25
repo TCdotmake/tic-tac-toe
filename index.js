@@ -40,6 +40,14 @@ function app() {
       }
       return true;
     },
+    checkActive: function(){return this.active},
+    validMove: function(index){
+      let valid = false;
+      for(let move of this.gameBoard.validMoves){
+        if(move.index == index){valid=true;}
+      }
+      return valid;
+    },
     validatePlayerMove: function (index) {
       if (this.active) {
         let currentPlayer;
@@ -148,6 +156,8 @@ function app() {
         newCell.setAttribute("data-cell", i);
         // newCell.innerText = i;
         newCell.addEventListener("click", (e) => {
+          
+          handleClickAlt(e);
           handleClick(e);
         });
         gameBoard.insertAdjacentElement("beforeend", newCell);
@@ -195,6 +205,12 @@ function app() {
         cells[index].classList.add("victory");
       });
     }
+  }
+
+  function handleClickAlt(e){
+    const index = e.target.dataset.cell;
+    console.log('active? ', ticTacToe.checkActive())
+    console.log(ticTacToe.validMove(index));
   }
 
   const aiMethods = {
@@ -404,9 +420,6 @@ function app() {
         this.setupPlayerNames();
         this.setupPlayerCells();
         this.active = true;
-        console.log(this.gameBoard.state);
-        console.log(this.player_1.cells);
-        console.log(this.player_2.cells);
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
