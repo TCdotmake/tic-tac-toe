@@ -198,6 +198,11 @@ function app() {
         if(this.gameBoard.state[i]===null){result.push(i);}
       }
       return result;
+    },
+    randomMoveAI: function(){
+      let validMoves = this.validMoveAI();
+      let index = Math.floor(Math.random()*validMoves.length);
+      return validMoves[index];
     }
   }
 
@@ -273,7 +278,9 @@ function app() {
   const toggleAI = document.getElementById('toggleAI');
   toggleAI.addEventListener('click', ()=>{ticTacToe.toggleAI()})
   const validMoves = document.getElementById('validMoves');
-  validMoves.addEventListener('click', ()=>{console.log(ticTacToe.validMoveAI())})
+  validMoves.addEventListener('click', ()=>{console.log(ticTacToe.validMoveAI())});
+  const randomMoves = document.getElementById('randomMoves');
+  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.randomMoveAI())})
 }
 
 app();
