@@ -31,11 +31,9 @@ function app() {
       });
       let result =
         victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
-      if (result.win) {
-        this.active = false;
-      }
       return result;
     },
+    gameEnd: function (){this.active = false;},
     checkForTie: function () {
       if (this.winCondition.state.includes(null)) {
         return false;
@@ -62,6 +60,7 @@ function app() {
 
         let token = currentPlayer.createToken();
         const victoryObj = this.checkForVictory(currentPlayer.getCells());
+        if(victoryObj.win){this.gameEnd()}
         if (this.active) {
           this.toggleActivePlayer();
         }
@@ -72,6 +71,7 @@ function app() {
           ...victoryObj,
         };
       }
+      return {valid: false, win: false}
     },
     toggleActivePlayer: function () {
       this.turn = !this.turn;
@@ -175,7 +175,7 @@ function app() {
   };
 
   function handleClick(e) {
-    console.log(e.target);
+    
     const index = e.target.dataset.cell;
     let response = ticTacToe.validatePlayerMove(index);
     //if move is valid
@@ -184,6 +184,7 @@ function app() {
       e.target.setAttribute("disabled", true);
       e.target.classList.add(response.playerClass);
     }
+    //if move lead to win
     if (response.win) {
       const cells = document.querySelectorAll(".cell");
       response.victoryCells.forEach((index) => {
@@ -201,23 +202,34 @@ function app() {
       else{toggleBtn.innerText = 'VS A.I.';}
       this.setupGame();
     },
-    validMoveAI: function(){
-      let result = [];
-      for(let i=0; i<this.gameBoard.state.length; i++){
-        if(this.gameBoard.state[i]===null){result.push({index: i, value:0});}
-      }
-      return result;
-    },
+
     randomMoveAI: function(){
-      let validMoves = this.validMoveAI();
-      let index = Math.floor(Math.random()*validMoves.length);
-      return validMoves[index];
+      
+      let index = Math.floor(Math.random()* this.gameBoard.validMoves.length);
+      return this.gameBoard.validMoves[index];
     },
     smartMoveAI: function(){
+      
+      //deepcopy validmoves
+      let validMoves =[];
+      for(ele of this.gameBoard.validMoves){
+        validMoves.push({...ele});
+      }
+      validMoves = this.guardAI(validMoves);
+      return validMoves;
+    },
+    guardAI: function(moves){
       //determine who AI is playing against
       let opponent = this.player_1;
       if(this.turn){opponent = this.player_2;}
-
+      for(n of moves){
+        let enemyCells = [...opponent.cells];
+        enemyCells.push(n.index);
+        if(this.checkForVictory(enemyCells).win){
+          n.value++;
+        }
+      }
+      return moves;
     }
   }
 
@@ -287,7 +299,7 @@ function app() {
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
 
   ticTacToe.setupGame();
-  console.log(ticTacToe.gameBoard.state);
+ 
   const newGame = document.getElementById('newGame');
   newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
   const toggleAI = document.getElementById('toggleAI');
@@ -295,7 +307,7 @@ function app() {
   const validMoves = document.getElementById('validMoves');
   validMoves.addEventListener('click', ()=>{console.log(ticTacToe.gameBoard.validMoves)});
   const randomMoves = document.getElementById('randomMoves');
-  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.randomMoveAI())})
+  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.smartMoveAI())})
 }
 
 app();
