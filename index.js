@@ -172,6 +172,10 @@ function app() {
         p1.classList.remove('active');
       }
     },
+    setupPlayerCells: function(){
+      this.player_1.cells = [];
+      this.player_2.cells = [];
+    }
   };
 
   function handleClick(e) {
@@ -208,7 +212,23 @@ function app() {
       let index = Math.floor(Math.random()* this.gameBoard.validMoves.length);
       return this.gameBoard.validMoves[index];
     },
-    smartMoveAI: function(){
+
+    getIndexAI: function(){
+      let maxVal = 0;
+      let moves = this.evalMovesAI();
+      for(let move of moves){
+        if(move.value > maxVal){
+          maxVal = move.value;
+        }
+      }
+      let selection = moves.filter(n=>{return n.value === maxVal});
+      let chosen = Math.floor(Math.random()*selection.length)
+      console.log('selection: '+selection);
+      console.log('index:' + selection[chosen].index)
+      return selection[chosen].index;
+    },
+
+    evalMovesAI: function(){
       
       //deepcopy validmoves
       let validMoves =[];
@@ -275,24 +295,29 @@ function app() {
       for(let move of moves){
         if(move.index === 4){move.value++}
       }
-      let relevantMoves = [];
-      for(let condition of this.winCondition.state){
-        for(let cell of player.cells){
-          if(condition.includes(cell)){
-            for(let n of condition){
-              if(n!==cell){relevantMoves.push(n)}
+      
+      if(player.cells.length>0){
+        let relevantMoves = [];
+        for(let condition of this.winCondition.state){
+          for(let cell of player.cells){
+            if(condition.includes(cell)){
+              for(let n of condition){
+                if(n!==cell){relevantMoves.push(n)}
+              }
+            }
+          }
+        }
+        for(let relevant of relevantMoves){
+          for(let move of moves){
+            if(move.index === relevant){
+              move.value++;
             }
           }
         }
       }
-      for(let relevant of relevantMoves){
-        for(let move of moves){
-          if(move.index === relevant){
-            move.value++;
-          }
-        }
-      }
-      let badMoves = [];
+      
+      if(opponent.cells.length>0){
+        let badMoves = [];
       for(let condition of this.winCondition.state){
         for(let cell of opponent.cells){
           if(condition.includes(cell)){
@@ -310,6 +335,9 @@ function app() {
           }
         }
       }
+      }
+
+      
       return moves;
     }
   }
@@ -374,7 +402,11 @@ function app() {
         this.setupWinCondition();
         this.setupFirstTurn();
         this.setupPlayerNames();
+        this.setupPlayerCells();
         this.active = true;
+        console.log(this.gameBoard.state);
+        console.log(this.player_1.cells);
+        console.log(this.player_2.cells);
       },
     };
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
@@ -388,7 +420,7 @@ function app() {
   const validMoves = document.getElementById('validMoves');
   validMoves.addEventListener('click', ()=>{console.log(ticTacToe.gameBoard.validMoves)});
   const randomMoves = document.getElementById('randomMoves');
-  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.smartMoveAI())})
+  randomMoves.addEventListener('click', ()=>{console.log(ticTacToe.getIndexAI())})
 }
 
 app();
