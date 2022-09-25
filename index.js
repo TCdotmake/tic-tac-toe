@@ -215,8 +215,11 @@ function app() {
       for(ele of this.gameBoard.validMoves){
         validMoves.push({...ele});
       }
+      console.log(validMoves);
+      validMoves = this.basicAI(validMoves);
       validMoves = this.guardAI(validMoves);
       validMoves = this.offensiveAI(validMoves);
+      // validMoves = this.adjacentAI(validMoves);
       return validMoves;
     },
     guardAI: function(moves){
@@ -232,7 +235,7 @@ function app() {
         playerCells.push(n.index);
         if(this.checkForVictory(playerCells).win){
           if(self){n.value = Infinity}
-          n.value++;
+          n.value+=10;
         }
       }
       return moves;
@@ -243,6 +246,71 @@ function app() {
       if(!this.turn){player = this.player_2;}
       let self = true;
       return this.parseWinAI(player, moves, self);
+    },
+    adjacentAI: function(moves){
+      //determine self
+      let player = this.player_1;
+      if(!this.turn){player = this.player_2;}
+      let playerCells = [...player.cells];
+      for(move of moves){
+        for(cell of playerCells){
+          if(move.index === cell + 1 ||
+            move.index === cell -1 ||
+            move.index === cell + this.size ||
+            move.index === cell - this.size
+            ){move.value++;}
+        }
+      }
+      return moves;
+    },
+    basicAI: function(moves){
+
+      //determine self
+      let player = this.player_1;
+      let opponent = this.player_2
+      if(!this.turn){
+        player = this.player_2;
+        opponent = this.player_1;
+      }
+      for(let move of moves){
+        if(move.index === 4){move.value++}
+      }
+      let relevantMoves = [];
+      for(let condition of this.winCondition.state){
+        for(let cell of player.cells){
+          if(condition.includes(cell)){
+            for(let n of condition){
+              if(n!==cell){relevantMoves.push(n)}
+            }
+          }
+        }
+      }
+      for(let relevant of relevantMoves){
+        for(let move of moves){
+          if(move.index === relevant){
+            move.value++;
+          }
+        }
+      }
+      let badMoves = [];
+      for(let condition of this.winCondition.state){
+        for(let cell of opponent.cells){
+          if(condition.includes(cell)){
+            for(let n of condition){
+              if(n!==cell){badMoves.push(n)}
+            }
+          }
+        }
+      }
+      console.log('bad: '+badMoves);
+      for(let bad of badMoves){
+        for(let move of moves){
+          if(move.index === bad){
+            move.value++;
+          }
+        }
+      }
+      return moves;
     }
   }
 
@@ -312,7 +380,7 @@ function app() {
   })((player1 = defaultP1), (player2 = defaultP2), (size = 3));
 
   ticTacToe.setupGame();
- 
+
   const newGame = document.getElementById('newGame');
   newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
   const toggleAI = document.getElementById('toggleAI');
