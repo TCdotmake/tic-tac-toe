@@ -18,6 +18,13 @@ function app() {
   };
 
   const gameFlowMethods = {
+    getValidMoves: function(boardArr){
+      let result = [];
+      for(let i=0; i<boardArr.length; i++){
+        if(boardArr[i]===null){result.push(i);}
+      }
+      return result;
+    },
     playerTurn: function(index){
       this.setCells(index);
       this.insertToken(index);
@@ -96,6 +103,17 @@ function app() {
       }
       return currentPlayer;
     },
+
+    getCurrentOpponent: function(){
+      let currentPlayer;
+      if (this.turn) {
+        currentPlayer = this.player_2;
+      } else {
+        currentPlayer = this.player_1;
+      }
+      return currentPlayer;
+    },
+
     getCurrentPlayerClass: function(){
       let playerClass = "player-two";
       if (this.turn) {
@@ -465,6 +483,31 @@ function app() {
     }
   }
 
+  const minMaxMethods = {
+    
+    nodeCreateRoot: function(){
+      let root = {};
+      // root.board = [...this.gameBoard.state];
+      root.maximizer = [...this.getCurrentPlayer().cells];
+      root.minimizer = [...this.getCurrentOpponent().cells];
+      root.moves = this.getValidMoves(this.gameBoard.state);
+      return root;
+    },
+    nodeCreateChild: function(node, cell, maxmizerTurn){
+      let newNode = {};
+      //find index of the cell in node.validMoves
+      let cellIndex = node.moves.findindex(cell);
+      //take cell out of available moves
+      newNode.moves = node.moves.splice(cellIndex, 1);
+      newNode.maximizer = [...node.maximizer];
+      newNode.minimizer = [...node.minimizer];
+      if(maxmizerTurn){newNode.maximizer.push(cell);}
+      else{newNode.minimizer.push(cell);}
+      return newNode;
+    }
+
+  }
+
   const winConditionProto = {
     getWinCondition: function () {
       return [...this.state];
@@ -518,6 +561,7 @@ function app() {
       ...gameFlowMethods,
       ...aiMethods,
       ...displayMethods,
+      ...minMaxMethods,
       setupGame: function () {
         this.setupGameBoard();
         this.setupWinCondition();
