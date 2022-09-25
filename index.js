@@ -495,17 +495,26 @@ function app() {
     },
     nodeCreateChild: function(node, cell, maxmizerTurn){
       let newNode = {};
-      //find index of the cell in node.validMoves
-      let cellIndex = node.moves.findindex(cell);
-      //take cell out of available moves
-      newNode.moves = node.moves.splice(cellIndex, 1);
+      
+      newNode.moves = [...node.moves];
+      newNode.moves = newNode.moves.filter(n=>n!=cell);
       newNode.maximizer = [...node.maximizer];
       newNode.minimizer = [...node.minimizer];
       if(maxmizerTurn){newNode.maximizer.push(cell);}
       else{newNode.minimizer.push(cell);}
       return newNode;
+    },
+    displayCurrentNodes: function(){
+      let root = this.nodeCreateRoot();
+      console.log('root: '+ JSON.stringify(root));
+      let childArr = [];
+      for(cell of root.moves){
+        childArr.push(this.nodeCreateChild(root, cell, true));
+      }
+      for (child of childArr){
+        console.log(JSON.stringify(child, null, 1));
+      }
     }
-
   }
 
   const winConditionProto = {
@@ -582,6 +591,8 @@ function app() {
   const togglePA2I = document.getElementById('toggleP2AI');
   toggleP1AI.addEventListener('click', ()=>{ticTacToe.toggleP1AI()});
   toggleP2AI.addEventListener('click', ()=>{ticTacToe.toggleP2AI()});
+  const displayNodes = document.getElementById('displayNodes');
+  displayNodes.addEventListener('click', ()=>ticTacToe.displayCurrentNodes())
 }
 
 app();
