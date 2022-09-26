@@ -3,36 +3,42 @@ function app() {
   const gameBoardProto = {
     setCell: function (index, token) {
       this.state[index] = token;
-        this.updateValidMoves();
+      this.updateValidMoves();
     },
     getCells: function () {
       return this.state;
     },
-    updateValidMoves: function(){
+    updateValidMoves: function () {
       let result = [];
-      for(let i=0; i<this.state.length; i++){
-        if(this.state[i]===null){result.push({index: i, value:0});}
+      for (let i = 0; i < this.state.length; i++) {
+        if (this.state[i] === null) {
+          result.push({ index: i, value: 0 });
+        }
       }
       this.validMoves = [...result];
-    }
+    },
   };
 
   const gameFlowMethods = {
-    getValidMoves: function(boardArr){
+    getValidMoves: function (boardArr) {
       let result = [];
-      for(let i=0; i<boardArr.length; i++){
-        if(boardArr[i]===null){result.push(i);}
+      for (let i = 0; i < boardArr.length; i++) {
+        if (boardArr[i] === null) {
+          result.push(i);
+        }
       }
       return result;
     },
-    playerTurn: function(index){
+    playerTurn: function (index) {
       this.setCells(index);
       this.insertToken(index);
-      if(this.checkForwin()){
+      if (this.checkForwin()) {
         this.displayWinToken();
         this.gameEnd();
       }
-      if(this.active){this.toggleActivePlayer();}
+      if (this.active) {
+        this.toggleActivePlayer();
+      }
     },
     checkForVictory: function (playerArr) {
       let victoryCells = [];
@@ -41,11 +47,10 @@ function app() {
           victoryCells = [...winArr];
         }
       });
-      let result =
-        victoryCells.length > 0 ? { win: true, victoryCells } : { win: false };
+      let result = victoryCells.length > 0 ? true : false;
       return result;
     },
-    checkForwin: function(){
+    checkForwin: function () {
       let playerArr = this.getCurrentPlayer().cells;
       let result = false;
       this.winCondition.state.forEach((winArr) => {
@@ -55,7 +60,7 @@ function app() {
       });
       return result;
     },
-    getWinArr: function(){
+    getWinArr: function () {
       let playerArr = this.getCurrentPlayer().cells;
       let result = [];
       this.winCondition.state.forEach((winArr) => {
@@ -65,36 +70,42 @@ function app() {
       });
       return result;
     },
-    gameEnd: function (){this.active = false;},
-    checkForTie: function () {
-      if (this.winCondition.state.includes(null)) {
+    gameEnd: function () {
+      this.active = false;
+    },
+    checkForTie: function (gameBoard) {
+      if (gameBoard.includes(null)) {
         return false;
       }
       return true;
     },
-    checkActive: function(){return this.active},
-    validMove: function(index){
+    checkActive: function () {
+      return this.active;
+    },
+    validMove: function (index) {
       let valid = false;
-      for(let move of this.gameBoard.validMoves){
-        if(move.index == index){valid=true;}
+      for (let move of this.gameBoard.validMoves) {
+        if (move.index == index) {
+          valid = true;
+        }
       }
       return valid;
     },
-    setCells: function(index){
+    setCells: function (index) {
       let currentPlayer;
       let playerClass = "";
       //determine whose turn it is
       if (this.turn) {
-          currentPlayer = this.player_1;
-          playerClass = "player-one";
+        currentPlayer = this.player_1;
+        playerClass = "player-one";
       } else {
-          currentPlayer = this.player_2;
-          playerClass = "player-two";
+        currentPlayer = this.player_2;
+        playerClass = "player-two";
       }
       currentPlayer.setCell(index);
-      this.gameBoard.setCell(index, currentPlayer.token)
+      this.gameBoard.setCell(index, currentPlayer.token);
     },
-    getCurrentPlayer: function(){
+    getCurrentPlayer: function () {
       let currentPlayer;
       if (this.turn) {
         currentPlayer = this.player_1;
@@ -104,7 +115,7 @@ function app() {
       return currentPlayer;
     },
 
-    getCurrentOpponent: function(){
+    getCurrentOpponent: function () {
       let currentPlayer;
       if (this.turn) {
         currentPlayer = this.player_2;
@@ -114,14 +125,14 @@ function app() {
       return currentPlayer;
     },
 
-    getCurrentPlayerClass: function(){
+    getCurrentPlayerClass: function () {
       let playerClass = "player-two";
       if (this.turn) {
         playerClass = "player-one";
-      } 
+      }
       return playerClass;
     },
-    getCurrentToken: function(){
+    getCurrentToken: function () {
       return this.getCurrentPlayer().createToken();
     },
     validatePlayerMove: function (index) {
@@ -144,7 +155,9 @@ function app() {
 
         let token = currentPlayer.createToken();
         const victoryObj = this.checkForVictory(currentPlayer.getCells());
-        if(victoryObj.win){this.gameEnd()}
+        if (victoryObj.win) {
+          this.gameEnd();
+        }
         if (this.active) {
           this.toggleActivePlayer();
         }
@@ -155,7 +168,7 @@ function app() {
           ...victoryObj,
         };
       }
-      return {valid: false, win: false}
+      return { valid: false, win: false };
     },
     toggleActivePlayer: function () {
       this.turn = !this.turn;
@@ -165,7 +178,7 @@ function app() {
       p2.classList.toggle("active");
       let currentPlayer = this.getCurrentPlayer();
 
-      if(currentPlayer.ai){
+      if (currentPlayer.ai) {
         this.aiTurn();
       }
     },
@@ -236,7 +249,7 @@ function app() {
         newCell.classList.add("cell");
         newCell.setAttribute("data-cell", i);
         // newCell.innerText = i;
-        newCell.addEventListener("click", (e) => { 
+        newCell.addEventListener("click", (e) => {
           handleClick(e);
         });
         gameBoard.insertAdjacentElement("beforeend", newCell);
@@ -255,29 +268,29 @@ function app() {
       p2.innerText = this.player_2.name;
       if (this.turn) {
         p1.classList.add("active");
-        p2.classList.remove('active');
+        p2.classList.remove("active");
       } else {
         p2.classList.add("active");
-        p1.classList.remove('active');
+        p1.classList.remove("active");
       }
     },
-    setupPlayerCells: function(){
+    setupPlayerCells: function () {
       this.player_1.cells = [];
       this.player_2.cells = [];
-    }
+    },
   };
 
-  function handleClick(e){
+  function handleClick(e) {
     const index = e.target.dataset.cell;
     //if game is active and move is valid
-    if(ticTacToe.checkActive() && ticTacToe.validMove(index)){
+    if (ticTacToe.checkActive() && ticTacToe.validMove(index)) {
       ticTacToe.playerTurn(index);
     }
   }
 
   const displayMethods = {
-    insertToken: function(index){
-      const cells = document.getElementsByClassName('cell');
+    insertToken: function (index) {
+      const cells = document.getElementsByClassName("cell");
       let targetCell = cells[index];
       let token = this.getCurrentToken();
       let playerClass = this.getCurrentPlayerClass();
@@ -285,96 +298,99 @@ function app() {
       targetCell.setAttribute("disabled", true);
       targetCell.classList.add(playerClass);
     },
-    displayWinToken: function(){
+    displayWinToken: function () {
       const cells = document.querySelectorAll(".cell");
       const victoryCells = this.getWinArr();
-      victoryCells.forEach(index=>{
-        cells[index].classList.add('victory');
-      })
-    }
-  }
-
+      victoryCells.forEach((index) => {
+        cells[index].classList.add("victory");
+      });
+    },
+  };
 
   const aiMethods = {
     //if AI is first, alway randomly put down a token for first move
-    firstTurn: function(){
+    firstTurn: function () {
       let currentPlayer = this.getCurrentPlayer();
-      if(currentPlayer.ai){
+      if (currentPlayer.ai) {
         this.playerTurn(this.randomIndexAI());
       }
     },
-    toggleAI: function(){
+    toggleAI: function () {
       this.useAI = !this.useAI;
-      console.log('useAI: '+this.useAI);
-      const toggleBtn = document.getElementById('toggleAI');
-      if(this.useAI){toggleBtn.innerText = 'VS PLAYER';}
-      else{toggleBtn.innerText = 'VS A.I.';}
+      console.log("useAI: " + this.useAI);
+      const toggleBtn = document.getElementById("toggleAI");
+      if (this.useAI) {
+        toggleBtn.innerText = "VS PLAYER";
+      } else {
+        toggleBtn.innerText = "VS A.I.";
+      }
       this.setupGame();
     },
 
-    immediateActionAI: function(){
+    immediateActionAI: function () {
       let currentPlayer = this.getCurrentPlayer();
-      if(currentPlayer.ai){
+      if (currentPlayer.ai) {
         this.aiTurn();
       }
     },
 
-    toggleP1AI: function(){
+    toggleP1AI: function () {
       this.player_1.ai = !this.player_1.ai;
-      if(this.player_1.ai){
-        this.player_1.name = 'A.I.';
-      }
-      else{
-        this.player_1.name = 'Player1';
+      if (this.player_1.ai) {
+        this.player_1.name = "A.I.";
+      } else {
+        this.player_1.name = "Player1";
       }
       this.setupPlayerNames();
       //take immediate action if swapping from player to AI
       this.immediateActionAI();
     },
 
-    toggleP2AI: function(){
+    toggleP2AI: function () {
       this.player_2.ai = !this.player_2.ai;
-      if(this.player_2.ai){
-        this.player_2.name = 'A.I.';
-      }
-      else{
-        this.player_2.name = 'Player2';
+      if (this.player_2.ai) {
+        this.player_2.name = "A.I.";
+      } else {
+        this.player_2.name = "Player2";
       }
       this.setupPlayerNames();
       //take immediate action if swapping from player to AI
       this.immediateActionAI();
     },
 
-    randomIndexAI: function(){
-      let selection = Math.floor(Math.random()* this.gameBoard.validMoves.length);
+    randomIndexAI: function () {
+      let selection = Math.floor(
+        Math.random() * this.gameBoard.validMoves.length
+      );
       return this.gameBoard.validMoves[selection].index;
     },
 
-    aiTurn: function(){
+    aiTurn: function () {
       this.playerTurn(this.getIndexAI());
     },
 
-    getIndexAI: function(){
+    getIndexAI: function () {
       let maxVal = 0;
       let moves = this.evalMovesAI();
-      for(let move of moves){
-        if(move.value > maxVal){
+      for (let move of moves) {
+        if (move.value > maxVal) {
           maxVal = move.value;
         }
       }
-      let selection = moves.filter(n=>{return n.value === maxVal});
-      let chosen = Math.floor(Math.random()*selection.length)
-      console.log('selection: '+selection);
-      console.log('index:' + selection[chosen].index)
+      let selection = moves.filter((n) => {
+        return n.value === maxVal;
+      });
+      let chosen = Math.floor(Math.random() * selection.length);
+      console.log("selection: " + selection);
+      console.log("index:" + selection[chosen].index);
       return selection[chosen].index;
     },
 
-    evalMovesAI: function(){
-      
+    evalMovesAI: function () {
       //deepcopy validmoves
-      let validMoves =[];
-      for(ele of this.gameBoard.validMoves){
-        validMoves.push({...ele});
+      let validMoves = [];
+      for (ele of this.gameBoard.validMoves) {
+        validMoves.push({ ...ele });
       }
       console.log(validMoves);
       validMoves = this.basicAI(validMoves);
@@ -383,139 +399,198 @@ function app() {
       // validMoves = this.adjacentAI(validMoves);
       return validMoves;
     },
-    guardAI: function(moves){
+    guardAI: function (moves) {
       //determine who AI is playing against
       let player = this.player_1;
-      if(this.turn){player = this.player_2;}
+      if (this.turn) {
+        player = this.player_2;
+      }
       let self = false;
       return this.parseWinAI(player, moves, self);
     },
-    parseWinAI: function(player, moves, self){   
-      for(n of moves){
+    parseWinAI: function (player, moves, self) {
+      for (n of moves) {
         let playerCells = [...player.cells];
         playerCells.push(n.index);
-        if(this.checkForVictory(playerCells).win){
-          if(self){n.value = Infinity}
-          n.value+=10;
+        if (this.checkForVictory(playerCells).win) {
+          if (self) {
+            n.value = Infinity;
+          }
+          n.value += 10;
         }
       }
       return moves;
     },
-    offensiveAI: function(moves){
+    offensiveAI: function (moves) {
       //determine self
       let player = this.player_1;
-      if(!this.turn){player = this.player_2;}
+      if (!this.turn) {
+        player = this.player_2;
+      }
       let self = true;
       return this.parseWinAI(player, moves, self);
     },
-    adjacentAI: function(moves){
+    adjacentAI: function (moves) {
       //determine self
       let player = this.player_1;
-      if(!this.turn){player = this.player_2;}
+      if (!this.turn) {
+        player = this.player_2;
+      }
       let playerCells = [...player.cells];
-      for(move of moves){
-        for(cell of playerCells){
-          if(move.index === cell + 1 ||
-            move.index === cell -1 ||
+      for (move of moves) {
+        for (cell of playerCells) {
+          if (
+            move.index === cell + 1 ||
+            move.index === cell - 1 ||
             move.index === cell + this.size ||
             move.index === cell - this.size
-            ){move.value++;}
+          ) {
+            move.value++;
+          }
         }
       }
       return moves;
     },
-    basicAI: function(moves){
-
+    basicAI: function (moves) {
       //determine self
       let player = this.player_1;
-      let opponent = this.player_2
-      if(!this.turn){
+      let opponent = this.player_2;
+      if (!this.turn) {
         player = this.player_2;
         opponent = this.player_1;
       }
-      for(let move of moves){
-        if(move.index === 4){move.value++}
+      for (let move of moves) {
+        if (move.index === 4) {
+          move.value++;
+        }
       }
-      
-      if(player.cells.length>0){
+
+      if (player.cells.length > 0) {
         let relevantMoves = [];
-        for(let condition of this.winCondition.state){
-          for(let cell of player.cells){
-            if(condition.includes(cell)){
-              for(let n of condition){
-                if(n!==cell){relevantMoves.push(n)}
+        for (let condition of this.winCondition.state) {
+          for (let cell of player.cells) {
+            if (condition.includes(cell)) {
+              for (let n of condition) {
+                if (n !== cell) {
+                  relevantMoves.push(n);
+                }
               }
             }
           }
         }
-        for(let relevant of relevantMoves){
-          for(let move of moves){
-            if(move.index === relevant){
+        for (let relevant of relevantMoves) {
+          for (let move of moves) {
+            if (move.index === relevant) {
               move.value++;
             }
           }
         }
       }
-      
-      if(opponent.cells.length>0){
+
+      if (opponent.cells.length > 0) {
         let badMoves = [];
-      for(let condition of this.winCondition.state){
-        for(let cell of opponent.cells){
-          if(condition.includes(cell)){
-            for(let n of condition){
-              if(n!==cell){badMoves.push(n)}
+        for (let condition of this.winCondition.state) {
+          for (let cell of opponent.cells) {
+            if (condition.includes(cell)) {
+              for (let n of condition) {
+                if (n !== cell) {
+                  badMoves.push(n);
+                }
+              }
+            }
+          }
+        }
+        console.log("bad: " + badMoves);
+        for (let bad of badMoves) {
+          for (let move of moves) {
+            if (move.index === bad) {
+              move.value++;
             }
           }
         }
       }
-      console.log('bad: '+badMoves);
-      for(let bad of badMoves){
-        for(let move of moves){
-          if(move.index === bad){
-            move.value++;
-          }
-        }
-      }
-      }
 
-      
       return moves;
-    }
-  }
+    },
+  };
 
   const minMaxMethods = {
-    
-    nodeCreateRoot: function(){
+    nodeCreateRoot: function () {
       let root = {};
       // root.board = [...this.gameBoard.state];
       root.maximizer = [...this.getCurrentPlayer().cells];
       root.minimizer = [...this.getCurrentOpponent().cells];
       root.moves = this.getValidMoves(this.gameBoard.state);
+      root.value = 0;
+      if (this.checkForVictory(root.maximizer)) {
+        root.value++;
+      }
+      if (this.checkForVictory(root.minimizer)) {
+        root.value--;
+      }
+      root.maximizerTurn = true;
       return root;
     },
-    nodeCreateChild: function(node, cell, maxmizerTurn){
+    nodeCreateChild: function (node, cell) {
       let newNode = {};
-      
+      //deepcopy parent's values
       newNode.moves = [...node.moves];
-      newNode.moves = newNode.moves.filter(n=>n!=cell);
       newNode.maximizer = [...node.maximizer];
       newNode.minimizer = [...node.minimizer];
-      if(maxmizerTurn){newNode.maximizer.push(cell);}
-      else{newNode.minimizer.push(cell);}
+      //take cell out of valid moves
+      newNode.moves = newNode.moves.filter((n) => n != cell);
+      //perform next move, maxmizerTurn = true means it's maximizer's turn
+      if (!node.maxmizerTurn) {
+        newNode.maximizer.push(cell);
+      } else {
+        newNode.minimizer.push(cell);
+      }
+      //toggle maximizerTurn for children
+      newNode.maximizerTurn = !node.maximizerTurn;
+      newNode.value = 0;
+      if (this.checkForVictory(newNode.maximizer)) {
+        newNode.value++;
+      }
+      if (this.checkForVictory(newNode.minimizer)) {
+        newNode.value--;
+      }
+      //check if game terminate at this node
+      newNode.branchEnd = this.nodeBranchEnd(newNode);
+      //if not create and attach branches for this node
+      if (!newNode.branchEnd) {
+        newNode.children = [];
+        for (let cell of newNode.moves) {
+          newNode.children.push(this.nodeCreateChild(newNode, cell));
+        }
+      }
       return newNode;
     },
-    displayCurrentNodes: function(){
+    nodeMakeTree: function () {
       let root = this.nodeCreateRoot();
-      console.log('root: '+ JSON.stringify(root));
+    },
+
+    nodeTie: function (node) {
+      return node.moves.length === 0;
+    },
+    nodeBranchEnd: function (node) {
+      return (
+        this.checkForVictory(node.maximizer) ||
+        this.checkForVictory(node.minimizer) ||
+        this.nodeTie(node)
+      );
+    },
+    displayCurrentNodes: function () {
+      let root = this.nodeCreateRoot();
+      console.log("root: " + JSON.stringify(root));
       let childArr = [];
-      for(cell of root.moves){
-        childArr.push(this.nodeCreateChild(root, cell, true));
+      for (cell of root.moves) {
+        childArr.push(this.nodeCreateChild(root, cell));
       }
-      for (child of childArr){
-        console.log(JSON.stringify(child, null, 1));
+      for (child of childArr) {
+        console.log(JSON.stringify(child));
       }
-    }
-  }
+    },
+  };
 
   const winConditionProto = {
     getWinCondition: function () {
@@ -585,14 +660,20 @@ function app() {
 
   ticTacToe.setupGame();
 
-  const newGame = document.getElementById('newGame');
-  newGame.addEventListener('click', ()=>{ticTacToe.setupGame()});
-  const toggleP1AI = document.getElementById('toggleP1AI');
-  const togglePA2I = document.getElementById('toggleP2AI');
-  toggleP1AI.addEventListener('click', ()=>{ticTacToe.toggleP1AI()});
-  toggleP2AI.addEventListener('click', ()=>{ticTacToe.toggleP2AI()});
-  const displayNodes = document.getElementById('displayNodes');
-  displayNodes.addEventListener('click', ()=>ticTacToe.displayCurrentNodes())
+  const newGame = document.getElementById("newGame");
+  newGame.addEventListener("click", () => {
+    ticTacToe.setupGame();
+  });
+  const toggleP1AI = document.getElementById("toggleP1AI");
+  const togglePA2I = document.getElementById("toggleP2AI");
+  toggleP1AI.addEventListener("click", () => {
+    ticTacToe.toggleP1AI();
+  });
+  toggleP2AI.addEventListener("click", () => {
+    ticTacToe.toggleP2AI();
+  });
+  const displayNodes = document.getElementById("displayNodes");
+  displayNodes.addEventListener("click", () => ticTacToe.displayCurrentNodes());
 }
 
 app();
