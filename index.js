@@ -565,10 +565,6 @@ function app() {
       }
       return newNode;
     },
-    nodeMakeTree: function () {
-      let root = this.nodeCreateRoot();
-    },
-
     nodeTie: function (node) {
       return node.moves.length === 0;
     },
@@ -579,16 +575,17 @@ function app() {
         this.nodeTie(node)
       );
     },
-    displayCurrentNodes: function () {
-      let root = this.nodeCreateRoot();
-      console.log("root: " + JSON.stringify(root));
-      let childArr = [];
-      for (cell of root.moves) {
-        childArr.push(this.nodeCreateChild(root, cell));
+    nodeCreateTree: function () {
+      let tree = this.nodeCreateRoot();
+      tree.children = [];
+      for (cell of tree.moves) {
+        tree.children.push(this.nodeCreateChild(tree, cell));
       }
-      for (child of childArr) {
-        console.log(JSON.stringify(child));
-      }
+      return tree;
+    },
+    displayTree: function () {
+      const tree = this.nodeCreateTree();
+      console.table(tree);
     },
   };
 
@@ -673,7 +670,7 @@ function app() {
     ticTacToe.toggleP2AI();
   });
   const displayNodes = document.getElementById("displayNodes");
-  displayNodes.addEventListener("click", () => ticTacToe.displayCurrentNodes());
+  displayNodes.addEventListener("click", () => ticTacToe.displayTree());
 }
 
 app();
