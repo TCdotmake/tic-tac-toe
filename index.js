@@ -32,7 +32,7 @@ function app() {
     playerTurn: function (index) {
       this.setCells(index);
       this.insertToken(index);
-      if (this.checkForwin()) {
+      if (this.checkForWin(this.getCurrentPlayer().cells)) {
         this.displayWinToken();
         this.gameEnd();
       }
@@ -40,18 +40,8 @@ function app() {
         this.toggleActivePlayer();
       }
     },
-    checkForVictory: function (playerArr) {
-      let victoryCells = [];
-      this.winCondition.state.forEach((winArr) => {
-        if (winArr.every((val) => playerArr.includes(val))) {
-          victoryCells = [...winArr];
-        }
-      });
-      let result = victoryCells.length > 0 ? true : false;
-      return result;
-    },
-    checkForwin: function () {
-      let playerArr = this.getCurrentPlayer().cells;
+
+    checkForWin: function (playerArr) {
       let result = false;
       this.winCondition.state.forEach((winArr) => {
         if (winArr.every((val) => playerArr.includes(val))) {
@@ -135,41 +125,7 @@ function app() {
     getCurrentToken: function () {
       return this.getCurrentPlayer().createToken();
     },
-    validatePlayerMove: function (index) {
-      if (this.active) {
-        let currentPlayer;
-        let playerClass = "";
-        //determine whose turn it is
-        if (this.turn) {
-          currentPlayer = this.player_1;
-          playerClass = "player-one";
-        } else {
-          currentPlayer = this.player_2;
-          playerClass = "player-two";
-        }
-        //try to place token on cell
-        let valid = currentPlayer.setCell(
-          this.gameBoard.setCell(index, currentPlayer.token),
-          index
-        );
-
-        let token = currentPlayer.createToken();
-        const victoryObj = this.checkForVictory(currentPlayer.getCells());
-        if (victoryObj.win) {
-          this.gameEnd();
-        }
-        if (this.active) {
-          this.toggleActivePlayer();
-        }
-        return {
-          valid,
-          token,
-          playerClass,
-          ...victoryObj,
-        };
-      }
-      return { valid: false, win: false };
-    },
+    
     toggleActivePlayer: function () {
       this.turn = !this.turn;
       const p1 = document.getElementById("p1");
@@ -412,7 +368,7 @@ function app() {
       for (n of moves) {
         let playerCells = [...player.cells];
         playerCells.push(n.index);
-        if (this.checkForVictory(playerCells).win) {
+        if (this.checkForWin(playerCells)) {
           if (self) {
             n.value = Infinity;
           }
@@ -522,10 +478,10 @@ function app() {
       root.minimizer = [...this.getCurrentOpponent().cells];
       root.moves = this.getValidMoves(this.gameBoard.state);
       root.value = 0;
-      if (this.checkForVictory(root.maximizer)) {
+      if (this.checkForWin(root.maximizer)) {
         root.value++;
       }
-      if (this.checkForVictory(root.minimizer)) {
+      if (this.checkForWin(root.minimizer)) {
         root.value--;
       }
       return root;
@@ -533,6 +489,7 @@ function app() {
     nodeCreateChild: function (node, cell) {
       let newNode = {};
       //deepcopy parent's values
+      newNode.cell = cell;
       newNode.moves = [...node.moves];
       newNode.maximizer = [...node.maximizer];
       newNode.minimizer = [...node.minimizer];
@@ -546,10 +503,10 @@ function app() {
       }
 
       newNode.value = 0;
-      if (this.checkForVictory(newNode.maximizer)) {
+      if (this.checkForWin(newNode.maximizer)) {
         newNode.value++;
       }
-      if (this.checkForVictory(newNode.minimizer)) {
+      if (this.checkForWin(newNode.minimizer)) {
         newNode.value--;
       }
       //check if game terminate at this node
@@ -568,8 +525,8 @@ function app() {
     },
     nodeBranchEnd: function (node) {
       return (
-        this.checkForVictory(node.maximizer) ||
-        this.checkForVictory(node.minimizer) ||
+        this.checkForWin(node.maximizer) ||
+        this.checkForWin(node.minimizer) ||
         this.nodeTie(node)
       );
     },
@@ -581,9 +538,24 @@ function app() {
       }
       return tree;
     },
+    nodeSetValue: function(node){
+      if(node.branchEnd){
+        return node.value;
+      }
+      else{
+        for(child of node.children){
+          node.value+= this.nodeSetValue(child);
+        }
+        return node.value;
+      }
+    },
     displayTree: function () {
       const tree = this.nodeCreateTree();
+      this.nodeSetValue(tree);
       console.table(tree);
+      for(child of tree.children){
+        console.log(child.cell + ' / ' + child.value+'\n');
+      }
     },
   };
 
