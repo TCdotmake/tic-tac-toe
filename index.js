@@ -528,7 +528,6 @@ function app() {
       if (this.checkForVictory(root.minimizer)) {
         root.value--;
       }
-      // root.maximizerTurn = true;
       return root;
     },
     nodeCreateChild: function (node, cell) {
@@ -539,14 +538,13 @@ function app() {
       newNode.minimizer = [...node.minimizer];
       //take cell out of valid moves
       newNode.moves = newNode.moves.filter((n) => n != cell);
-      //perform next move, maxmizerTurn = true means it's maximizer's turn
+      //update player
       if (newNode.maximizer.length > newNode.minimizer.length) {
         newNode.minimizer.push(cell);
       } else {
         newNode.maximizer.push(cell);
       }
-      //toggle maximizerTurn for children
-      newNode.maximizerTurn = !node.maximizerTurn;
+
       newNode.value = 0;
       if (this.checkForVictory(newNode.maximizer)) {
         newNode.value++;
